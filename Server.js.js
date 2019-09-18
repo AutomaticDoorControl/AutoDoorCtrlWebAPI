@@ -66,7 +66,7 @@ app.get("/api/addAll", function(req , res){
 // login to the app  for students**
 app.post("/api/login", function(req , res){
 	console.log(req.body.RCSid);
-	var query = "select * from students where RCSid = " + mysql.escape(req.body.RCSid);
+	var query = "select * from students where Status = 'Active' and RCSid = " + mysql.escape(req.body.RCSid);
 	console.log(query);
 	executeQuery (res, query);
 });
