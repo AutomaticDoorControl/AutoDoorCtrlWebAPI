@@ -4,6 +4,9 @@ var bodyParser = require("body-parser");
 var mysql = require("mysql");
 var app = express();
 var bcrypt = require("bcrypt");
+var fs = require("fs");
+var jwt = require("jsonwebtoken");
+var expressJWT = require("express-jwt");
 
 // Setting Base directory
 app.use(bodyParser.json());
@@ -31,6 +34,10 @@ var connection = mysql.createConnection({
 	database:	"users"
 });
 
+const ADMIN_RSA_PRIVATE_KEY = fs.readFileSync('./private.key');
+const ADMIN_RSA_PUBLIC_KEY = fs.readFileSync('./public.key');
+var adminAuth = expressJWT({secret : ADMIN_RSA_PUBLIC_KEY});
+
 //Function to connect to database and execute query
 var  executeQuery = function(res, query){	
 	connection.query(query, function (error, results, fields) {
@@ -46,19 +53,19 @@ var  executeQuery = function(res, query){
 }
 
 // get active student data **
-app.get("/api/active_user", function(req , res){
+app.get("/api/active_user", adminAuth, function(req , res){
 	var query = "select * from students where Status = 'Active' ";
 	executeQuery (res, query);
 });
 
 // get student request data **
-app.get("/api/inactive_user", function(req , res){
+app.get("/api/inactive_user", adminAuth, function(req , res){
 	var query = "select * from students where Status = 'Request' ";
 	executeQuery (res, query);
 });
 
 //add all student requests to active**
-app.get("/api/addAll", function(req , res){
+app.get("/api/addAll", adminAuth, function(req , res){
 	var query = "UPDATE students SET Status = 'Active' WHERE Status = 'Request'";
 	executeQuery (res, query);
 });
@@ -90,8 +97,13 @@ app.post("/api/admin/login", function(req , res){
 					}
 					else {
 						if(hashMatches) {
+							var jwtBearerToken = jwt.sign({}, ADMIN_RSA_PRIVATE_KEY, {
+                                                                algorithm: 'RS256',
+                                                                expiresIn: 3600,
+                                                                subject: results[0].username
+                                                        });
 							console.log(results);
-							res.send(results);
+							res.send(jwtBearerToken);
 						}
 						else {
 							console.log("Wrong password!");
@@ -118,7 +130,7 @@ app.post("/api/request-access", function(req , res){
 });
 
 //add singular student to active status **
-app.post("/api/addtoActive", function(req , res){
+app.post("/api/addtoActive", adminAuth, function(req , res){
 	console.log(req.body.RCSid);
 	var query = "UPDATE students SET Status = 'Active' WHERE RCSid = " + mysql.escape(req.body.RCSid);
 	console.log(query);
@@ -126,7 +138,7 @@ app.post("/api/addtoActive", function(req , res){
 });
 
 //remove a student from active access **
-app.post("/api/remove", function(req , res){
+app.post("/api/remove", adminAuth, function(req , res){
 	console.log(req.body.RCSid);
 	var query = "DELETE FROM students WHERE RCSid = " + mysql.escape(req.body.RCSid);
 	console.log(query);
@@ -142,7 +154,13 @@ app.post("/api/submit-complaint", function(req , res){
 });
 
 // list complaints made
-app.get("/api/get-complaints", function(req , res){
+app.get("/api/get-complaints", adminAuth, function(req , res){
 	var query = "select * from complaints";
 	executeQuery (res, query);
+});
+
+app.use(function (err, req, res, next) {
+        if(err.name == "UnauthorizedError")
+                res.status(401).send([]);
+        next(err);
 });
