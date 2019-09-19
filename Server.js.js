@@ -103,7 +103,7 @@ app.post("/api/admin/login", function(req , res){
                                                                 subject: results[0].username
                                                         });
 							console.log(results);
-							res.send(jwtBearerToken);
+							res.send({SESSIONID : jwtBearerToken});
 						}
 						else {
 							console.log("Wrong password!");
