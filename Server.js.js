@@ -146,3 +146,9 @@ app.get("/api/get-complaints", function(req , res){
 	var query = "select * from complaints";
 	executeQuery (res, query);
 });
+
+// get list of doors
+app.get("/api/get-doors", function(req, res){
+       var query = "select * from doors";
+       executeQuery (res, query);
+});
