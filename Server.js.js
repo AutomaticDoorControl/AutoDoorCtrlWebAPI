@@ -3,6 +3,7 @@ var express = require("express");
 var bodyParser = require("body-parser");
 var mysql = require("mysql");
 var app = express();
+var bcrypt = require("bcrypt");
 
 // Setting Base directory
 app.use(bodyParser.json());
@@ -65,7 +66,7 @@ app.get("/api/addAll", function(req , res){
 // login to the app  for students**
 app.post("/api/login", function(req , res){
 	console.log(req.body.RCSid);
-	var query = "select * from students where RCSid = " + mysql.escape(req.body.RCSid);
+	var query = "select * from students where Status = 'Active' and RCSid = " + mysql.escape(req.body.RCSid);
 	console.log(query);
 	executeQuery (res, query);
 });
@@ -73,9 +74,39 @@ app.post("/api/login", function(req , res){
 // login to the app  for admin**
 app.post("/api/admin/login", function(req , res){
 	console.log(req.body.username);
-	var query = "select * from admin where username = " + mysql.escape(req.body.username) + " and password = " + mysql.escape(req.body.password);
+	var query = "select * from admin where username = " + mysql.escape(req.body.username);
 	console.log(query);
-	executeQuery (res, query);
+	connection.query(query, function (connError, results, fields) {
+		if (connError) {
+			console.log("Database error :- " + connError);
+			res.send(connError);
+		}
+		else {
+			if(results.length > 0) {
+				bcrypt.compare(req.body.password, results[0].password, function(bcryptError, hashMatches) {
+					if (bcryptError) {
+						console.log("bcrypt error :- " + bcryptError);
+						res.send(bcryptError);
+					}
+					else {
+						if(hashMatches) {
+							console.log(results);
+							res.send(results);
+						}
+						else {
+							console.log("Wrong password!");
+							res.send([]);
+						}
+					}
+
+				});
+			}
+			else {
+				console.log("No matching users found");
+				res.send([]);
+			}
+		}
+	});
 });
 
 //register for the app ** 
@@ -115,4 +146,3 @@ app.get("/api/get-complaints", function(req , res){
 	var query = "select * from complaints";
 	executeQuery (res, query);
 });
-
