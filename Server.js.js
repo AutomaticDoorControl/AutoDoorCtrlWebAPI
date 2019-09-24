@@ -27,7 +27,7 @@ app.use(function (req, res, next) {
 var connection = mysql.createConnection({
 	user:		"developer",
 	password:	"developer",
-	host:		"192.168.56.103",
+	host:		"localhost",
 	database:	"users"
 });
 
