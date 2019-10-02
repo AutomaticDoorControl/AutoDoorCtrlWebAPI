@@ -29,7 +29,7 @@ Admins are JSON objects in the form `{"username": <username>, "password": <bcryp
 ### POST requests
 * /api/login
     * Supply a JSON object in the form `{"RCSid": <RCSid>}`
-    * Returns an array of Users with the RCSid that matches `<RCSid>`
+    * Returns an array of Users with the RCSid that matches `<RCSid>` and Status `Active`
         * This array will be of length 0 or 1, depending on whether such an User exists
 * /api/admin/login
     * Supply a JSON object in the form `{"username": <username>, "password": <password>}`
