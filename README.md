@@ -9,7 +9,7 @@ AutoDoorCtrlWebAPI is the API we use to connect our angular2 web app  to our use
   * API should be running on `localhost:8080`
 
 ## API Calls
-Users are JSON objects in the form `{"Username": null, "Status": "Active|Request", "RCSid": <RCSid>}`
+Users are JSON objects in the form `{"Status": "Active|Request", "RCSid": <RCSid>}`
 
 Admins are JSON objects in the form `{"username": <username>, "password": <bcrypted password>}`
 
@@ -37,7 +37,7 @@ Admins are JSON objects in the form `{"username": <username>, "password": <bcryp
         * This array will be of length 0 or 1, depending on whether such an Admin exists
 * /api/request-access
     * Supply a JSON object in the form `{"RCSid": <RCSid>}`
-    * Adds a row to Users with the values `{"Username": null, “Status”: Request, "RCSid": <RCSid>}`
+    * Adds a row to Users with the values `{"Status": Request, "RCSid": <RCSid>}`
     * Returns a throwaway value
 * /api/addtoActive
     * Supply a JSON object in the form `{"RCSid": <RCSid>}`
