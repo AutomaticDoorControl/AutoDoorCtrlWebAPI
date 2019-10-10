@@ -7,6 +7,7 @@ AutoDoorCtrlWebAPI is the API we use to connect our angular web app to our user 
   * `npm install`
   * run `node Server.js.js` to start the API
   * API should be running on `localhost:8080`
+  * NOTE: This API will not work without the use of a properly setup MySQL database. Point the API to the db by changing `connection` in `Server.js.js`
 
 ## API Calls
 Users are JSON objects in the form `{"Status": "Active|Request", "RCSid": <RCSid>}`
