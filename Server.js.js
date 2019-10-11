@@ -30,7 +30,7 @@ app.use(function (req, res, next) {
 var connection = mysql.createConnection({
 	user:		"developer",
 	password:	"developer",
-	host:		"192.168.56.103",
+	host:		"localhost",
 	database:	"users"
 });
 
@@ -157,6 +157,12 @@ app.post("/api/submit-complaint", function(req , res){
 app.get("/api/get-complaints", adminAuth, function(req , res){
 	var query = "select * from complaints";
 	executeQuery (res, query);
+});
+
+// get list of doors
+app.get("/api/get-doors", function(req, res){
+       var query = "select * from doors";
+       executeQuery (res, query);
 });
 
 app.use(function (err, req, res, next) {
