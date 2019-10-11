@@ -34,9 +34,12 @@ var connection = mysql.createConnection({
 	database:	"users"
 });
 
-const ADMIN_RSA_PRIVATE_KEY = fs.readFileSync('./private.key');
-const ADMIN_RSA_PUBLIC_KEY = fs.readFileSync('./public.key');
+const ADMIN_RSA_PRIVATE_KEY = fs.readFileSync('./adminPrivate.key');
+const ADMIN_RSA_PUBLIC_KEY = fs.readFileSync('./adminPublic.key');
 var adminAuth = expressJWT({secret : ADMIN_RSA_PUBLIC_KEY});
+
+const USER_RSA_PRIVATE_KEY = fs.readFileSync('./userPrivate.key');
+const USER_RSA_PUBLIC_KEY = fs.readFileSync('./userPublic.key');
 
 //Function to connect to database and execute query
 var  executeQuery = function(res, query){	
@@ -75,7 +78,27 @@ app.post("/api/login", function(req , res){
 	console.log(req.body.RCSid);
 	var query = "select * from students where Status = 'Active' and RCSid = " + mysql.escape(req.body.RCSid);
 	console.log(query);
-	executeQuery (res, query);
+	connection.query(query, function (connError, results, fields) {
+		if (connError) {
+			console.log("Database error :- " + connError);
+			res.send(connError);
+		}
+		else {
+			if(results.length > 0) {
+				var jwtBearerToken = jwt.sign({}, USER_RSA_PRIVATE_KEY, {
+					algorithm: 'RS256',
+					expiresIn: 3600,
+					subject: results[0].RCSid
+				});
+				console.log(results);
+				res.send({SESSIONID : jwtBearerToken});
+			}
+			else {
+				console.log("No matching users found");
+				res.send({SESSIONID : ""});
+			}
+		}
+	});
 });
 
 // login to the app  for admin**
@@ -107,7 +130,7 @@ app.post("/api/admin/login", function(req , res){
 						}
 						else {
 							console.log("Wrong password!");
-							res.send([]);
+							res.send({SESSIONID : ""});
 						}
 					}
 
@@ -115,7 +138,7 @@ app.post("/api/admin/login", function(req , res){
 			}
 			else {
 				console.log("No matching users found");
-				res.send([]);
+				res.send({SESSIONID : ""});
 			}
 		}
 	});
