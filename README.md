@@ -1,12 +1,13 @@
 # AutoDoorCtrlWebAPI
-AutoDoorCtrlWebAPI is the API we use to connect our angular2 web app  to our user database and authentication system. The API is built with node.js and MySQL server. The repository for the website can be found [Here](https://github.com/AutomaticDoorControl/AutoDoorCtrlWeb)
+AutoDoorCtrlWebAPI is the API we use to connect our angular web app to our user database and authentication system. The API is built with node.js and MySQL server. The repository for the website can be found [Here](https://github.com/AutomaticDoorControl/AutoDoorCtrlWeb)
 
 ## What to install
   * clone respository `https://github.com/AutomaticDoorControl/AutoDoorCtrlWebAPI.git`
-  * navigate to AutoDoorCtrlWebApI on your machine
+  * navigate to AutoDoorCtrlWebAPI on your machine
   * `npm install`
-  * run `node server.js` to start the API
+  * run `node Server.js.js` to start the API
   * API should be running on `localhost:8080`
+  * NOTE: This API will not work without the use of a properly setup MySQL database. Point the API to the db by changing `connection` in `Server.js.js`
 
 ## API Calls
 Users are JSON objects in the form `{"Status": "Active|Request", "RCSid": <RCSid>}`
