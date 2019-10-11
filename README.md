@@ -13,15 +13,17 @@ Users are JSON objects in the form `{"Status": "Active|Request", "RCSid": <RCSid
 
 Admins are JSON objects in the form `{"username": <username>, "password": <bcrypted password>}`
 
+Requests with a star (\*) require admin authentication, otherwise they will return a `401 Unauthorized` error. Authentication is handled by sending the header `Authorization: Bearer <JWT>` as part of the request, where `<JWT>` is the Json Web Token recieved during login. User JWTs are not valid for admin authentication.
+
 ### GET requests
-* /api/active_user
+* /api/active_user \*
     * Returns an array of all Users where Status is `Active`
-* /api/inactive_user
+* /api/inactive_user \*
     * Returns an array of all Users where Status is `Request`
-* /api/addAll
+* /api/addAll \*
     * Changes all Users' Status to `Active`
     * Returns a throwaway value
-* /api/get-complaints
+* /api/get-complaints \*
     * Returns an array of JSON items in the form `{"location": <location>, "message": <message>}`
 * /api/get-doors
     * Returns an array of JSON items in the form `{"name": <name>, "location": <location>, "latitude": <latitude>, "longitude": <longitude>}`
@@ -29,21 +31,21 @@ Admins are JSON objects in the form `{"username": <username>, "password": <bcryp
 ### POST requests
 * /api/login
     * Supply a JSON object in the form `{"RCSid": <RCSid>}`
-    * Returns an array of Users with the RCSid that matches `<RCSid>` and Status `Active`
-        * This array will be of length 0 or 1, depending on whether such an User exists
+    * Returns a JSON object in the form `{"SESSIONID": <JWT>}` where `<JWT>` is a signed JSON web token with `sub` field matching `<RCSID>`
+    * If `<RCSid>` does not represent a valid active user, `<JWT>` will be an empty string `""`
 * /api/admin/login
     * Supply a JSON object in the form `{"username": <username>, "password": <password>}`
-    * Returns an array of Admins with a username that matches `<username>` and a bcrypted password that matches `<password>`
-        * This array will be of length 0 or 1, depending on whether such an Admin exists
+    * Returns a JSON object in the form `{"SESSIONID": <JWT>}` where `<JWT>` is a signed JSON web token with `sub` field matching `<username>`
+    * If `<username>` and `<password>` do not together represent a valid active user, `<JWT>` will be an empty string `""`
 * /api/request-access
     * Supply a JSON object in the form `{"RCSid": <RCSid>}`
     * Adds a row to Users with the values `{"Status": Request, "RCSid": <RCSid>}`
     * Returns a throwaway value
-* /api/addtoActive
+* /api/addtoActive \*
     * Supply a JSON object in the form `{"RCSid": <RCSid>}`
     * Changes the status of User with RCSid `<RCSid>` to `Active`
     * Returns a throwaway value
-* /api/remove
+* /api/remove \*
     * Supply a JSON object in the form `{"RCSid": <RCSid>}`
     * Deletes all Users with RCSid `<RCSid>`
     * Returns a throwaway value
